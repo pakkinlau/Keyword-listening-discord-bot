@@ -1,0 +1,72 @@
+@startuml
+
+start
+
+split
+
+    partition creating-the-client {
+    split 
+        :client = discord.Client();
+        split
+            :define event1;
+        split again
+            :define event2;
+        end split
+    split again
+        :app = Flask("");
+        :defines keep_alive() to stay the bot awake;
+    split again
+        : store token on an individual .env file;
+
+    end split
+    }
+
+split again
+
+    partition DiscorbWebSocket {
+        floating note: Web Socket is interacting with the API?
+        :@classmethod from_client(*args,**kwargs);
+
+        :gateway = gateway or await client.http.get_gateway();
+        :socket = await client.http.ws_connect(gateway);
+        :ws = cls(socket, loop=client.loop);
+
+        :dynamically add attributes needed;
+    }
+
+end split
+
+partition client.run(TOKEN) {
+:client.run(TOKEN)
+(A blocking call that abstracts away the event loop);
+:asyncio.run(runner());
+:await with self: 
+     await self.start(*args,**kwargs);
+
+split
+:await self.login;
+:if self.loop is _loop: await self._async_setup_hook();
+:data=await self.http.static_login(token.strip());
+:self._connection.user = ClientUser(state=self._connection, data=data);
+:await self.setup_hook();
+split again
+:await self.connect(reconnect=reconnect)
+
+(Create a websocket connection and lets the websocket listen
+to messages from Discord. This is a loop that runs the 
+entire event system and misc aspect of the library.);
+
+:ws_params = {'ititial': True,'shard_id': self.shard_id};
+
+:coro = DiscordWebSocket.from_client(self, **ws_params);
+:self.ws = await asyncio.wait_for(coro,timeout=60.0;)
+
+:self.ws.poll_event()
+(polls for a dispatch event and handles the general gateway loop);
+:self.dispatch('disconnect');
+end split
+
+
+}
+
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+control EventLoop
+
+activate EventLoop
+EventLoop -> Task: assign tasks \n to N task objects
+activate Task
+Task -> outer_function: execute outer_function()
+activate outer_function
+outer_function -> inner_function: await inner_function()
+activate inner_function
+inner_function -> inner_function: some time consuming operations
+inner_function -> Task
+deactivate inner_function
+Task -> EventLoop
+
+@enduml
